@@ -1,20 +1,24 @@
 using UnityEngine;
 
-public class PowerUpSpawner2D : MonoBehaviour
+public class PowerUpSpawner : MonoBehaviour
 {
-    public Transform player;             // your bird
-    public GameObject powerUpPrefab;
+    public Transform player;
+    public GameObject speedPrefab;
+    public GameObject slowPrefab;
 
-    public float spawnInterval = 2f;     // seconds between spawns
-    public float forwardDistance = 10f;  // in front of the player
-    public float verticalRange = 5f;     // up/down randomness
+    public float spawnInterval = 2f;
+    public float forwardDistance = 10f;
+    public float verticalRange = 5f;
+    public float minY = -4f;
+    public float maxY = 4f;
 
     private float timer = 0f;
 
     void Update()
     {
-        timer += Time.deltaTime;
+        if (player == null) return;
 
+        timer += Time.deltaTime;
         if (timer >= spawnInterval)
         {
             SpawnPowerUp();
@@ -24,13 +28,15 @@ public class PowerUpSpawner2D : MonoBehaviour
 
     void SpawnPowerUp()
     {
-        // Spawn in front of the player based on its facing direction
-        Vector2 spawnPos = (Vector2)player.position + (Vector2)player.right * forwardDistance;
+        GameObject prefabToSpawn = (Random.value < 0.7f) ? speedPrefab : slowPrefab;
 
-        // Random vertical offset
-        spawnPos += new Vector2(0f, Random.Range(-verticalRange, verticalRange));
+        Vector2 spawnPos = (Vector2)player.position + Vector2.right * forwardDistance;
 
-        // Instantiate the powerup
-        Instantiate(powerUpPrefab, spawnPos, Quaternion.identity);
+        float randomY = Random.Range(-verticalRange, verticalRange);
+        spawnPos.y += randomY;
+
+        spawnPos.y = Mathf.Clamp(spawnPos.y, minY, maxY);
+
+        Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
     }
 }

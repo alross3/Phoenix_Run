@@ -21,9 +21,12 @@ public class PlayerMove : MonoBehaviour
     private float launchTimer = 0f;
     public float launchDuration = 0.2f; // how long the upward burst lasts
 
-    [Header("Simple Stall Settings")]
     public float stallThreshold = 1f;       // speed where downward pull begins
     public float stallDownForce = -5f;      // how hard it drops
+
+    public float minY = -5f; // lowest Y the player can go
+    public float maxY = 5f;  // highest Y the player can go
+
 
 
     private Rigidbody2D rb2d;
@@ -59,6 +62,10 @@ public class PlayerMove : MonoBehaviour
         angle = Mathf.Clamp(angle, -45f, 45f);
 
         transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        Vector3 pos = transform.position;
+        pos.y = Mathf.Clamp(pos.y, minY, maxY);
+        transform.position = pos;
     }
 
     void FixedUpdate()
