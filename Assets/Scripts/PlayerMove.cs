@@ -1,51 +1,55 @@
-using NUnit.Framework;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float forwardForce = 5f;
     public float rotateSpeed = 90f;
     public float liftStrength = 5f;
+
+    //Speed
     public float baseSpeed = 5f;
-    public float climbPenalty = 2f;
-    public float diveBoost = 3f;
     public float minSpeed = 2f;
     public float maxSpeed = 12f;
+    public float airResistance = 0.1f;
 
     public float currentSpeed;
 
-    public float airResistance = 0.1f;
-
-    //Stall Variables
-    public float stallSpeed = 1.0f;
-    public float stallAngle = 30f;
-    private bool isStalled = false;
-    public float stallFallSpeed = -5f;
-
-    //Launch Variables
+    //Launch
     public bool isLaunched = false;
     public float launchUpForce = 5f;
     public float launchForwardSpeed = 5f;
 
+    private float launchTimer = 0f;
+    public float launchDuration = 0.2f; // how long the upward burst lasts
+
+    [Header("Simple Stall Settings")]
+    public float stallThreshold = 1f;       // speed where downward pull begins
+    public float stallDownForce = -5f;      // how hard it drops
+
+
     private Rigidbody2D rb2d;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
         currentSpeed = baseSpeed;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        
         if (!isLaunched && Input.GetKeyDown(KeyCode.Space))
         {
             isLaunched = true;
+            launchTimer = launchDuration;
+
+            
             rb2d.linearVelocity = new Vector2(launchForwardSpeed, launchUpForce);
             currentSpeed = launchForwardSpeed;
         }
+
+        if (!isLaunched) return;
+
+        
         float input = Input.GetAxisRaw("Vertical");
 
         float angle = transform.eulerAngles.z;
@@ -59,47 +63,25 @@ public class PlayerMove : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isLaunched) return;
-        float angle = transform.eulerAngles.z;
-        if (angle > 180) angle -= 360;
+    if (!isLaunched) return;
 
-        float normalized = angle / 45f;
-        
-        if (normalized < 0)
-        {
-            currentSpeed -= normalized * climbPenalty * Time.fixedDeltaTime;
-        }
-        else if (normalized > 0)
-        {
-            currentSpeed -= normalized * diveBoost * Time.fixedDeltaTime;
-        }
-        
-        currentSpeed -= currentSpeed * airResistance * Time.fixedDeltaTime;
+    float angle = transform.eulerAngles.z;
+    if (angle > 180) angle -= 360;
 
-        if(!isStalled)
-        {
-            if (angle > stallAngle && currentSpeed <= stallSpeed)
-            {
-                isStalled = true;
-            }
-        }
-        else
-        {
-            rb2d.linearVelocity = new Vector2(rb2d.linearVelocity.x, stallFallSpeed);
+    currentSpeed -= currentSpeed * airResistance * Time.fixedDeltaTime;
+    currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
 
-            if (currentSpeed > stallSpeed + 0.5f && angle < stallAngle )
-            {
-                isStalled = false;
-
-                return;
-            }
-        }
-        currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
-
-        rb2d.linearVelocity = new Vector2 (currentSpeed, rb2d.linearVelocity.y);
-
-        float angleRad = angle * Mathf.Deg2Rad;
-        float lift = Mathf.Sin(angleRad) * liftStrength;
-        rb2d.AddForce(Vector2.up * lift);
+    if (currentSpeed < stallThreshold)
+    {
+    rb2d.AddForce(new Vector2(0f, stallDownForce), ForceMode2D.Force);
     }
+
+    rb2d.linearVelocity = transform.right * currentSpeed;
+    }
+    public void AddSpeed(float amount)
+    {
+        currentSpeed += amount;
+    }
+
+
 }
