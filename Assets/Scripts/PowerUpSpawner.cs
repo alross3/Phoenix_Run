@@ -37,6 +37,6 @@ public class PowerUpSpawner : MonoBehaviour
 
         spawnPos.y = Mathf.Clamp(spawnPos.y, minY, maxY);
 
-        Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
+        Instantiate(prefabToSpawn, spawnPos, prefabToSpawn.transform.rotation);
     }
 }

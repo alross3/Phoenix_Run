@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class SlowdownPickup : MonoBehaviour
 {
-    public float slowAmount = 3f; // how much to slow the player
+    public float slowAmount = 3f;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -10,10 +10,8 @@ public class SlowdownPickup : MonoBehaviour
 
         if (player != null)
         {
-            // Reduce speed directly
             player.currentSpeed -= slowAmount;
 
-            // Clamp so the player doesn't go below min speed
             player.currentSpeed = Mathf.Max(player.currentSpeed, player.minSpeed);
 
             Destroy(gameObject);

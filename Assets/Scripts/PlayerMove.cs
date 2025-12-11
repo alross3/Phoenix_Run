@@ -19,13 +19,13 @@ public class PlayerMove : MonoBehaviour
     public float launchForwardSpeed = 5f;
 
     private float launchTimer = 0f;
-    public float launchDuration = 0.2f; // how long the upward burst lasts
+    public float launchDuration = 0.2f; 
 
-    public float stallThreshold = 1f;       // speed where downward pull begins
-    public float stallDownForce = -5f;      // how hard it drops
-
-    public float minY = -5f; // lowest Y the player can go
-    public float maxY = 5f;  // highest Y the player can go
+    public float stallThreshold = 1f; 
+    public float stallDownForce = -5f;    
+    //Area Clamp
+    public float minY = -5f; 
+    public float maxY = 5f;  
 
 
 
@@ -39,7 +39,7 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-        
+        //Launch
         if (!isLaunched && Input.GetKeyDown(KeyCode.Space))
         {
             isLaunched = true;
@@ -62,7 +62,7 @@ public class PlayerMove : MonoBehaviour
         angle = Mathf.Clamp(angle, -45f, 45f);
 
         transform.rotation = Quaternion.Euler(0, 0, angle);
-
+        //Clamp
         Vector3 pos = transform.position;
         pos.y = Mathf.Clamp(pos.y, minY, maxY);
         transform.position = pos;

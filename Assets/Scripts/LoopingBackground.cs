@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class LoopingBackground : MonoBehaviour
 {
-    public Transform player;          // The bird/player
-    public float scrollSpeed = 1f;    // Background moves relative to player
-    private float spriteWidth;        // Width of first child sprite
-
+    public Transform player; 
+    public float scrollSpeed = 1f;
+    private float spriteWidth;
     private Vector3 startPosition;    
-    private float lastPlayerX;        // Track last frame's player X
+    private float lastPlayerX;
 
     void Start()
     {
